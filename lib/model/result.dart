@@ -14,15 +14,19 @@ abstract class Result implements Built<Result, ResultBuilder> {
   Result._();
 
   @BuiltValueField(wireName: 'title')
+  @nullable
   String get title;
 
   @BuiltValueField(wireName: 'version')
+  @nullable
   double get version;
 
   @BuiltValueField(wireName: 'href')
+  @nullable
   String get link;
 
   @BuiltValueField(wireName: 'results')
+  @nullable
   BuiltList<Recipe> get results;
 
   factory Result([updates(ResultBuilder b)]) = _$Result;

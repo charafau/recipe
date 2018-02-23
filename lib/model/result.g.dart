@@ -25,20 +25,32 @@ class _$ResultSerializer implements StructuredSerializer<Result> {
   @override
   Iterable serialize(Serializers serializers, Result object,
       {FullType specifiedType: FullType.unspecified}) {
-    final result = <Object>[
-      'title',
-      serializers.serialize(object.title,
-          specifiedType: const FullType(String)),
-      'version',
-      serializers.serialize(object.version,
-          specifiedType: const FullType(double)),
-      'href',
-      serializers.serialize(object.link, specifiedType: const FullType(String)),
-      'results',
-      serializers.serialize(object.results,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(Recipe)])),
-    ];
+    final result = <Object>[];
+    if (object.title != null) {
+      result
+        ..add('title')
+        ..add(serializers.serialize(object.title,
+            specifiedType: const FullType(String)));
+    }
+    if (object.version != null) {
+      result
+        ..add('version')
+        ..add(serializers.serialize(object.version,
+            specifiedType: const FullType(double)));
+    }
+    if (object.link != null) {
+      result
+        ..add('href')
+        ..add(serializers.serialize(object.link,
+            specifiedType: const FullType(String)));
+    }
+    if (object.results != null) {
+      result
+        ..add('results')
+        ..add(serializers.serialize(object.results,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(Recipe)])));
+    }
 
     return result;
   }
@@ -92,14 +104,7 @@ class _$Result extends Result {
   factory _$Result([void updates(ResultBuilder b)]) =>
       (new ResultBuilder()..update(updates)).build();
 
-  _$Result._({this.title, this.version, this.link, this.results}) : super._() {
-    if (title == null) throw new BuiltValueNullFieldError('Result', 'title');
-    if (version == null)
-      throw new BuiltValueNullFieldError('Result', 'version');
-    if (link == null) throw new BuiltValueNullFieldError('Result', 'link');
-    if (results == null)
-      throw new BuiltValueNullFieldError('Result', 'results');
-  }
+  _$Result._({this.title, this.version, this.link, this.results}) : super._();
 
   @override
   Result rebuild(void updates(ResultBuilder b)) =>
@@ -189,12 +194,12 @@ class ResultBuilder implements Builder<Result, ResultBuilder> {
               title: title,
               version: version,
               link: link,
-              results: results.build());
+              results: _results?.build());
     } catch (_) {
       String _$failedField;
       try {
         _$failedField = 'results';
-        results.build();
+        _results?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'Result', _$failedField, e.toString());
