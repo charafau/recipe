@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_built_redux/flutter_built_redux.dart';
 import 'package:built_redux/built_redux.dart';
@@ -5,6 +7,7 @@ import 'package:recipe/model/models.dart';
 import 'package:recipe/reducers/reducers.dart';
 import 'package:recipe/actions/actions.dart';
 import 'package:recipe/middleware/store_recipies_middleware.dart';
+import 'package:recipe/widgets/recipe_item.dart';
 
 final ThemeData kDefaultTheme = new ThemeData(
   primarySwatch: Colors.orange,
@@ -52,6 +55,10 @@ class RecipeAppState extends State<RecipeApp> {
 class SomeWidget extends StoreConnector<AppState, AppActions, AppState> {
   SomeWidget({Key key}) : super(key: key);
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      new GlobalKey<RefreshIndicatorState>();
+
   @override
   Widget build(BuildContext context, AppState state, AppActions actions) {
     Widget content;
@@ -60,16 +67,19 @@ class SomeWidget extends StoreConnector<AppState, AppActions, AppState> {
         child: new CircularProgressIndicator(),
       );
     } else {
-      content = new ListView.builder(
-        padding: new EdgeInsets.all(16.0),
-        itemBuilder: (BuildContext context, int index) =>
-            _buildTile(index, state),
-        itemCount:
-            state.result.results != null ? state.result.results.length : 0,
+      content = new RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: new ListView.builder(
+          padding: new EdgeInsets.all(16.0),
+          itemBuilder: (BuildContext context, int index) =>
+              _buildTile(index, state),
+          itemCount:
+              state.result.results != null ? state.result.results.length : 0,
+        ),
       );
     }
-
     return new Scaffold(
+      key: _scaffoldKey,
       appBar: new AppBar(
         title: new Text('Recipe'),
       ),
@@ -77,59 +87,27 @@ class SomeWidget extends StoreConnector<AppState, AppActions, AppState> {
     );
   }
 
+  Future<Null> _handleRefresh() {
+    final Completer<Null> completer = new Completer<Null>();
+    new Timer(const Duration(seconds: 3), () {
+      completer.complete(null);
+    });
+    return completer.future.then((_) {
+      _scaffoldKey.currentState?.showSnackBar(new SnackBar(
+          content: const Text('Refresh complete'),
+          action: new SnackBarAction(
+              label: 'RETRY',
+              onPressed: () {
+                _refreshIndicatorKey.currentState.show();
+              })));
+    });
+  }
+
   @override
   AppState connect(AppState state) => state;
 
   Widget _buildTile(int index, AppState state) {
     Recipe recipe = state.result.results.elementAt(index);
-    return new Card(
-      child: new InkWell(
-        onTap: () {},
-        child: new Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              new Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new SizedBox(
-                    width: 48.0,
-                    child: new ClipRRect(
-                      borderRadius: new BorderRadius.circular(50.0),
-                      child: new Image.network(recipe.thumbnail),
-                    ),
-                  ),
-                  new Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      new Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: new Text(recipe.title),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              new Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: new Wrap(
-                  spacing: 8.0,
-                  runSpacing: 4.0,
-                  children: _buildIngrediesnt(recipe.ingredients),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildIngrediesnt(String ingredients) {
-    List<String> split = ingredients.split(',');
-    split.removeWhere((string) => string == "");
-
-    return split.map((i) => new Chip(label: new Text(i),)).toList();
+    return new RecipeItem(recipe: recipe);
   }
 }
