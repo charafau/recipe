@@ -52,21 +52,28 @@ class RecipeAppState extends State<RecipeApp> {
 class SomeWidget extends StoreConnector<AppState, AppActions, AppState> {
   SomeWidget({Key key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context, AppState state, AppActions actions) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Recipe'),
-      ),
-      body: new ListView.builder(
+    Widget content;
+    if (state.isLoading) {
+      content = new Center(
+        child: new CircularProgressIndicator(),
+      );
+    } else {
+      content = new ListView.builder(
         padding: new EdgeInsets.all(16.0),
-        itemExtent: 120.0,
         itemBuilder: (BuildContext context, int index) =>
             _buildTile(index, state),
         itemCount:
             state.result.results != null ? state.result.results.length : 0,
+      );
+    }
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text('Recipe'),
       ),
+      body: content,
     );
   }
 
@@ -80,22 +87,49 @@ class SomeWidget extends StoreConnector<AppState, AppActions, AppState> {
         onTap: () {},
         child: new Padding(
           padding: const EdgeInsets.all(8.0),
-          child: new Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              new SizedBox(
-                width: 48.0,
-                child: new ClipRRect(
-                  borderRadius: new BorderRadius.circular(50.0),
-                  child: new Image.network(recipe.thumbnail),
+              new Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new SizedBox(
+                    width: 48.0,
+                    child: new ClipRRect(
+                      borderRadius: new BorderRadius.circular(50.0),
+                      child: new Image.network(recipe.thumbnail),
+                    ),
+                  ),
+                  new Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      new Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: new Text(recipe.title),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              new Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: new Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: _buildIngrediesnt(recipe.ingredients),
                 ),
               ),
-              new Text(recipe.title),
-              new Text('Test 2'),
             ],
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildIngrediesnt(String ingredients) {
+    List<String> split = ingredients.split(',');
+    split.removeWhere((string) => string == "");
+
+    return split.map((i) => new Chip(label: new Text(i),)).toList();
   }
 }

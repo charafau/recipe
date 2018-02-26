@@ -8,5 +8,7 @@ var reducerBuiler = new ReducerBuilder<AppState, AppStateBuilder>()
 void fetchedRecipiesSuccess(
     AppState state, Action<Result> action, AppStateBuilder builder) {
   print('result is loaded' + action.payload.toString());
-  builder.result = action.payload.toBuilder();
+  builder
+      ..result = action.payload.toBuilder()
+      ..isLoading = false;
 }
