@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:built_redux/built_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_built_redux/flutter_built_redux.dart';
-import 'package:built_redux/built_redux.dart';
-import 'package:recipe/model/models.dart';
-import 'package:recipe/reducers/reducers.dart';
 import 'package:recipe/actions/actions.dart';
 import 'package:recipe/middleware/store_recipies_middleware.dart';
+import 'package:recipe/model/models.dart';
+import 'package:recipe/reducers/reducers.dart';
+import 'package:recipe/widgets/details_screen.dart';
 import 'package:recipe/widgets/recipe_item.dart';
 
 final ThemeData kDefaultTheme = new ThemeData(
@@ -41,11 +42,15 @@ class RecipeAppState extends State<RecipeApp> {
         store: store,
         child: new SomeWidget(),
       ),
+      routes: <String, WidgetBuilder>{
+        '/details': (BuildContext context) => new DetailsScreen()
+      },
     );
   }
 
   @override
   void initState() {
+    MaterialPageRoute.debugEnableFadingRoutes = true;
     store = widget.store;
     store.actions.fetchRecipiesAction();
     super.initState();
