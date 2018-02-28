@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:recipe/model/recipe.dart';
-
-import 'dart:math' as math;
-
 import 'package:recipe/widgets/details_screen.dart';
+import 'package:recipe/widgets/photo.dart';
+import 'package:recipe/widgets/radial_expansion.dart';
 
 class RecipeItem extends StatelessWidget {
   static const double kMinRadius = 32.0;
@@ -47,13 +46,14 @@ class RecipeItem extends StatelessWidget {
                                       Animation<double> secondaryAnimation) {
                                     return new AnimatedBuilder(
                                         animation: animation,
-                                        builder:
-                                            (BuildContext context, Widget child) {
+                                        builder: (BuildContext context,
+                                            Widget child) {
                                           return new Opacity(
                                             opacity: opacityCurve
                                                 .transform(animation.value),
 //                                  child: _buildPage(context, imageName, description),
-                                            child: new DetailsScreen(),
+                                            child: new DetailsScreen(
+                                                recipe: recipe),
                                           );
                                         });
                                   },
@@ -63,13 +63,6 @@ class RecipeItem extends StatelessWidget {
                           ),
                         )),
                   ),
-//                  new SizedBox(
-//                    width: 48.0,
-//                    child: new ClipRRect(
-//                      borderRadius: new BorderRadius.circular(50.0),
-//                      child: new Image.network(recipe.thumbnail),
-//                    ),
-//                  ),
                   new Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
@@ -105,61 +98,5 @@ class RecipeItem extends StatelessWidget {
               label: new Text(i),
             ))
         .toList();
-  }
-}
-
-class RadialExpansion extends StatelessWidget {
-  RadialExpansion({
-    Key key,
-    this.maxRadius,
-    this.child,
-  })
-      : clipRectSize = 2.0 * (maxRadius / math.SQRT2),
-        super(key: key);
-
-  final double maxRadius;
-  final clipRectSize;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return new ClipOval(
-      child: new Center(
-        child: new SizedBox(
-          width: clipRectSize,
-          height: clipRectSize,
-          child: new ClipRect(
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class Photo extends StatelessWidget {
-  Photo({Key key, this.photo, this.color, this.onTap}) : super(key: key);
-
-  final String photo;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return new Material(
-      // Slightly opaque color appears where the image has transparency.
-      color: Theme.of(context).primaryColor.withOpacity(0.25),
-      child: new InkWell(
-        onTap: onTap,
-        child: new LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints size) {
-            return new Image.network(
-              photo,
-              fit: BoxFit.contain,
-            );
-          },
-        ),
-      ),
-    );
   }
 }
