@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
+import 'package:recipe/config/application.dart';
 import 'package:recipe/model/recipe.dart';
 import 'package:recipe/widgets/details_screen.dart';
 import 'package:recipe/widgets/photo.dart';
@@ -11,15 +13,16 @@ class RecipeItem extends StatelessWidget {
       const Interval(0.0, 0.75, curve: Curves.fastOutSlowIn);
 
   final Recipe recipe;
+  final int position;
 
-  RecipeItem({this.recipe});
+  RecipeItem({@required this.recipe, @required this.position});
 
   @override
   Widget build(BuildContext context) {
     return new Card(
       child: new InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed('/details');
+          Application.router.navigateTo(context, "/details/$position");
         },
         child: new Padding(
           padding: const EdgeInsets.all(8.0),
@@ -51,9 +54,8 @@ class RecipeItem extends StatelessWidget {
                                           return new Opacity(
                                             opacity: opacityCurve
                                                 .transform(animation.value),
-//                                  child: _buildPage(context, imageName, description),
                                             child: new DetailsScreen(
-                                                recipe: recipe),
+                                                recipePosition: position),
                                           );
                                         });
                                   },
